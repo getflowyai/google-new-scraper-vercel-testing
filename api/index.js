@@ -1,19 +1,29 @@
-const express = require('express');
-const cors = require('cors');
 const googleNewsScraper = require("../gns");
-const bodyParser = require('body-parser');
 
-const app = express();
-app.use(cors());
-app.use(bodyParser.json()); 
-app.use(bodyParser.urlencoded({ extended: true }));
+module.exports = async (req, res) => {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-app.get('/api', async (req, res) => {
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  // Only allow GET requests
+  if (req.method !== 'GET') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+
   try {
     let timer = 0;
     const interval = setInterval(() => {
       timer++
     }, 1);
+    
     const articles = await googleNewsScraper({
       searchTerm: "The Oscars",
       prettyURLs: true,
@@ -30,20 +40,14 @@ app.get('/api', async (req, res) => {
       ], 
       useLambdaLayer: true, 
     });
+    
     clearInterval(interval);
-    res.json({
-      articles, timer
-    })
+    res.status(200).json({
+      articles, 
+      timer
+    });
   } catch (err) {
     console.error(err);
-    res.json({error: err});
+    res.status(500).json({error: err.message || err});
   }
-});
-
-// Start the server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
-
-module.exports = app;
+};
