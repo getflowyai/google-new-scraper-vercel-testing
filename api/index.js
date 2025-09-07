@@ -19,21 +19,34 @@ module.exports = async (req, res) => {
   }
 
   try {
+    // Get parameters from query string
+    const { 
+      searchTerm = "The Oscars", 
+      timeframe = "7d", 
+      language = "en-US", 
+      country = "US" 
+    } = req.query;
+
+    // Map language to country code for ceid
+    const countryCode = country.toUpperCase();
+    const languageCode = language.toLowerCase();
+    const ceid = `${countryCode}:${languageCode.split('-')[0]}`;
+
     let timer = 0;
     const interval = setInterval(() => {
       timer++
     }, 1);
     
     const articles = await googleNewsScraper({
-      searchTerm: "The Oscars",
+      searchTerm: searchTerm,
       prettyURLs: true,
       getArticleContent: false, 
       queryVars: {
-        hl:"en-US",
-        gl:"US",
-        ceid:"US:en"
+        hl: language,
+        gl: countryCode,
+        ceid: ceid
       },
-      timeframe: "5d",
+      timeframe: timeframe,
       puppeteerArgs: [
         "--no-sandbox", 
         "--disable-setuid-sandbox"
@@ -44,7 +57,11 @@ module.exports = async (req, res) => {
     clearInterval(interval);
     res.status(200).json({
       articles, 
-      timer
+      timer,
+      searchTerm,
+      timeframe,
+      language,
+      country
     });
   } catch (err) {
     console.error(err);
