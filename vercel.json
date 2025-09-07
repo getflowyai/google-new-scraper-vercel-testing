@@ -1,4 +1,9 @@
 {
-    "version": 2,
-    "rewrites": [{ "source": "/api/(.*)", "destination": "/api" }]
+  "version": 2,
+  "builds": [
+    { "src": "gns/index.js", "use": "@vercel/node" }
+  ],
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/gns/index.js" }
+  ]
 }

@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "run": "node index.js",
-    "start": "node index.js"
+    "run": "node gns/index.js",
+    "start": "node gns/ndex.js"
   },
   "repository": {
     "type": "git",
