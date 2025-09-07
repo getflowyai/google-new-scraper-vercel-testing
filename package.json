@@ -6,7 +6,6 @@
   "scripts": {
     "test": "jest",
     "run": "node index.js",
-    "build": "echo BUILD",
     "start": "node index.js"
   },
   "repository": {
